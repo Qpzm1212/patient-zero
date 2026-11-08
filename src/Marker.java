@@ -67,7 +67,77 @@ public class Marker {
      * Example: a = "ACGTAC", b = "TTACGT", k = 4: the words of a are ACGT, CGTA, GTAC; only ACGT is in b, so the answer is 1.
      */
     public static int sharedWords(String a, String b, int k) {
-        // TODO Mission 4
-        return -1;
+        if (k <= 0 || a.length() < k || b.length() < k) {
+            return 0;
+        }
+        long base = 131L;
+        long mod = 1_000_000_007L;
+        long top = 1;
+        for (int i = 1; i < k; i++) {
+            top = (top * base) % mod;
+        }
+
+        Map<Long, List<Integer>> bHashes = new HashMap<>();
+        long hb = 0;
+        for (int i = 0; i < k; i++) {
+            hb = (hb * base + b.charAt(i)) % mod;
+        }
+        addBWindow(bHashes, b, hb, 0, k);
+
+        for (int j = 1; j + k <= b.length(); j++) {
+            hb = (hb - (long) b.charAt(j - 1) * top) % mod;
+            if (hb < 0) hb += mod;
+            hb = (hb * base + b.charAt(j + k - 1)) % mod;
+            addBWindow(bHashes, b, hb, j, k);
+        }
+
+        int count = 0;
+        long ha = 0;
+        for (int i = 0; i < k; i++) {
+            ha = (ha * base + a.charAt(i)) % mod;
+        }
+        if (isMatch(bHashes, a, 0, ha, b, k)) {
+            count++;
+        }
+
+        for (int i = 1; i + k <= a.length(); i++) {
+            ha = (ha - (long) a.charAt(i - 1) * top) % mod;
+            if (ha < 0) ha += mod;
+            ha = (ha * base + a.charAt(i + k - 1)) % mod;
+            if (isMatch(bHashes, a, i, ha, b, k)) {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private static void addBWindow(Map<Long, List<Integer>> bHashes, String b, long hash, int start, int k) {
+        List<Integer> list = bHashes.computeIfAbsent(hash, key -> new ArrayList<>());
+        for (int prev : list) {
+            if (sameSubstring(b, prev, b, start, k)) {
+                return;
+            }
+        }
+        list.add(start);
+    }
+
+    private static boolean isMatch(Map<Long, List<Integer>> bHashes, String a, int aStart, long hash, String b, int k) {
+        List<Integer> list = bHashes.get(hash);
+        if (list == null) return false;
+        for (int bStart : list) {
+            if (sameSubstring(a, aStart, b, bStart, k)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean sameSubstring(String s1, int start1, String s2, int start2, int k) {
+        for (int i = 0; i < k; i++) {
+            if (s1.charAt(start1 + i) != s2.charAt(start2 + i)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
