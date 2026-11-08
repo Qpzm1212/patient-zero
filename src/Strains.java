@@ -41,7 +41,20 @@ public class Strains {
      * Example: "ACGTT" and "AGTC": the longest is "AGT", length 3.
      */
     public static int lcsLength(String a, String b) {
-        // TODO Mission 2
-        return -1;
+        int n = a.length();
+        int m = b.length();
+        int[][] l = new int[n + 1][m + 1];
+        for (int i = 1; i <= n; i++) {
+            char ca = a.charAt(i - 1);
+            for (int j = 1; j <= m; j++) {
+                char cb = b.charAt(j - 1);
+                if (ca == cb) {
+                    l[i][j] = l[i - 1][j - 1] + 1;
+                } else {
+                    l[i][j] = Math.max(l[i - 1][j], l[i][j - 1]);
+                }
+            }
+        }
+        return l[n][m];
     }
 }
