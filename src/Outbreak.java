@@ -17,8 +17,44 @@ public class Outbreak {
      * Main calls this twice: with all costs equal to 1 (the line "Tests needed") and with the real costs ("Cheapest testing").
      */
     public static boolean[] cheapestTests(int n, int[][] nb, int[] cost) {
-        // TODO Mission 5a
-        return new boolean[n];
+        if (n <= 0) return new boolean[0];
+        int[] par = new int[n];
+        Arrays.fill(par, -1);
+        int[] ord = new int[n];
+        int head = 0, tail = 0;
+        ord[tail++] = 0;
+        par[0] = 0;
+
+        while (head < tail) {
+            int v = ord[head++];
+            for (int u : nb[v]) {
+                if (u != 0 && par[u] == -1) {
+                    par[u] = v;
+                    ord[tail++] = u;
+                }
+            }
+        }
+
+        long[] take = new long[n];
+        long[] skip = new long[n];
+        for (int h = n - 1; h >= 0; h--) {
+            int v = ord[h];
+            take[v] += cost[v];
+            if (v != 0) {
+                int p = par[v];
+                take[p] += Math.min(take[v], skip[v]);
+                skip[p] += take[v];
+            }
+        }
+
+        boolean[] tested = new boolean[n];
+        tested[0] = (take[0] <= skip[0]);
+        for (int h = 1; h < n; h++) {
+            int v = ord[h];
+            int p = par[v];
+            tested[v] = !tested[p] || (take[v] <= skip[v]);
+        }
+        return tested;
     }
 
     /**
@@ -27,7 +63,41 @@ public class Outbreak {
      * Example: a line 0-1-2-3 has chain 3; a star with centre 0 and leaves 1, 2, 3 has chain 2.
      */
     public static int longestChain(int n, int[][] nb) {
-        // TODO Mission 5b
-        return -1;
+        if (n <= 1) return 0;
+        int[] par = new int[n];
+        Arrays.fill(par, -1);
+        int[] ord = new int[n];
+        int head = 0, tail = 0;
+        ord[tail++] = 0;
+        par[0] = 0;
+
+        while (head < tail) {
+            int v = ord[head++];
+            for (int u : nb[v]) {
+                if (u != 0 && par[u] == -1) {
+                    par[u] = v;
+                    ord[tail++] = u;
+                }
+            }
+        }
+
+        int[] top1 = new int[n];
+        int[] top2 = new int[n];
+        int chain = 0;
+        for (int h = n - 1; h >= 0; h--) {
+            int v = ord[h];
+            chain = Math.max(chain, top1[v] + top2[v]);
+            if (v != 0) {
+                int p = par[v];
+                int hh = top1[v] + 1;
+                if (hh > top1[p]) {
+                    top2[p] = top1[p];
+                    top1[p] = hh;
+                } else if (hh > top2[p]) {
+                    top2[p] = hh;
+                }
+            }
+        }
+        return chain;
     }
 }
