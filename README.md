@@ -80,10 +80,4 @@ n is the length of the text (or of a strain), m the length of the pattern, k the
 | Rabin-Karp (shared words) | Average: $O(n + m)$, Worst: $O(n \cdot m)$ | $O(m)$ | Rolling hash updated in $O(1)$ per window of length $k$; hash table lookup is $O(1)$ on average, with character comparison upon collision. |
 | Tree DP | $O(v)$ | $O(v)$ | Tree has $v$ vertices and $v-1$ edges; tree traversal and bottom-up DP visit each node and edge a constant number of times. |
 
-## Before you submit
 
-- The four files in `data` and the screenshot `output/outbreak.png` are in the repository.
-- `java tools/Check.java` shows all examples right.
-- This README is filled in, the program output and the section AI use included.
-- The work is pushed to main (at least one commit per mission) and the repository is public.
-- The link is attached in Moodle.
